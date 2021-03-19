@@ -5,7 +5,6 @@ typedef struct node {
 	struct node *left;
 	struct node *right;
 	int value;
-	int height;
 }NODE;
 
 int _print_t(NODE* tree, int is_left, int offset, int depth, char s[20][255]); //TEMP
@@ -18,77 +17,77 @@ NODE* rotateRightLeftBST(NODE* start);
 NODE* rotateLeftRightBST(NODE* start);
 int getTreeHeight(NODE* node);
 NODE* balanceBST(NODE* start);
+NODE* search(NODE* node, int v);
 
 int main() {
 
 	NODE* start = NULL;
 	int r;
-	for (int i = 0; i < 40; i++) {
-		r = rand() % 90 + 1;
+	for (int i = 0; i < 20000; i++) {
+		r = rand() % 50000 + 1;
 		start = insertNode(start, r);
-		start = balanceBST(start);
-		print_t(start);
+		//print_t(start);
+		//printf("%d\n", r);
 	}
 
-	/*for (int i = 1; i < 20; i+=2) {
-		start = insertNode(start, i);
-		start = balanceBST(start);
-		print_t(start);
-	}*/
-
-//	print_t(start);
-	//printf("%d\n",getTreeHeight(start));
-	//start = rotateLeftBST(start);
-
-	//start = rotateRightBST(start);
+	NODE *a = search(start, 456);
+	
+	
+	
 	
 
-	print_t(start);
+	//print_t(start);
 	return 0;
+}
+
+NODE* search(NODE* node, int v) {
+	if (node != NULL) {
+		if (node->value < v)
+			return search(node->right, v);
+		else if (node->value > v)
+			return search(node->left, v);
+		else {
+			return node;
+		}
+	}
+	return NULL;
 }
 
 int getTreeHeight(NODE* node) {
 	if (node != NULL) {
 		int left = getTreeHeight(node->left);
 		int right = getTreeHeight(node->right);
-		return (node->height = 1 + ((left > right) ? left : right));
+		return ( 1 + ((left > right) ? left : right));
 	}
 	return -1;
 }
 
 NODE* balanceBST(NODE* start) {
-	int left = getTreeHeight(start->left);
-	int right = getTreeHeight(start->right);
+	int left = getTreeHeight(start->left)+ 1;
+	int right = getTreeHeight(start->right)+ 1;
 
 	int i, L,R;
 
 	if (left - right > 1) {
-		R = (start->left->right == NULL) ? 0 : start->left->right->height;
-		L = (start->left->left == NULL) ? 0 : start->left->left->height;
-		if (L - R >= 0 ) {
-			for (i = 0; i < (left - right - 1); i++) {
-				start = rotateRightBST(start);
-			}
+		R = getTreeHeight(start->left->right) + 1;
+		L = getTreeHeight(start->left->left) + 1;
+		if (R - L < 0 ) {
+			start = rotateRightBST(start);
 		}
 		else {
-			for (i = 0; i < (left - right - 1); i++) {
-				start = rotateRightLeftBST(start);
-			}
+			start = rotateRightLeftBST(start);
 		}
 	}
 
 	if (left - right < -1) {
-		R = (start->right->right == NULL) ? 0 : start->right->right->height;
-		L = (start->right->left == NULL) ? 0 : start->right->left->height;
-		if (L - R >= 0) {
-			for (i = 0; i < right - left - 1; i++) {
-				start = rotateLeftRightBST(start);
-			}
+		R = getTreeHeight(start->right->right) + 1;
+		L = getTreeHeight(start->right->left) + 1;
+
+		if (R - L < 0) {
+			start = rotateLeftRightBST(start);
 		}
 		else {
-			for (i = 0; i < right - left - 1; i++) {
-				start = rotateLeftBST(start);
-			}
+			start = rotateLeftBST(start);
 		}
 	}
 
@@ -110,9 +109,10 @@ NODE* rotateRightLeftBST(NODE* start) {
 
 NODE* rotateLeftRightBST(NODE* start) {
 	NODE* oldTop = start->right;
-	start->right = oldTop->left;
-	oldTop->left = start->right->right;
-	start->right->right = oldTop;
+	NODE* newTop = oldTop->left;
+	start->right = newTop;
+	oldTop->left = newTop->right;
+	newTop->right = oldTop;
 
 	start = rotateLeftBST(start);
 
@@ -154,13 +154,19 @@ NODE* rotateLeftBST(NODE* start) {
 
 
 NODE* insertNode(NODE* node, int v) {
+
 	if (node != NULL) {
-		if (node->value < v)
+		if (node->value < v){
 			node->right = insertNode(node->right, v);
-		else if (node->value > v)
+			node = balanceBST(node);
+		
+		}
+		else if (node->value > v) {
 			node->left = insertNode(node->left, v);
+			node = balanceBST(node);
+		} 
 		else {
-			printf("Given value already exists\n");
+			//printf("Given value already exists\n");
 			return node;
 		}
 	}
