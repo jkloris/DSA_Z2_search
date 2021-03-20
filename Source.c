@@ -5,6 +5,7 @@ typedef struct node {
 	struct node *left;
 	struct node *right;
 	int value;
+	int height;
 }NODE;
 
 int _print_t(NODE* tree, int is_left, int offset, int depth, char s[20][255]); //TEMP
@@ -23,8 +24,8 @@ int main() {
 
 	NODE* start = NULL;
 	int r;
-	for (int i = 0; i < 20000; i++) {
-		r = rand() % 50000 + 1;
+	for (int i = 0; i < 200000; i++) {
+		r = rand() % 500000 + 1;
 		start = insertNode(start, r);
 		//print_t(start);
 		//printf("%d\n", r);
@@ -63,32 +64,56 @@ int getTreeHeight(NODE* node) {
 }
 
 NODE* balanceBST(NODE* start) {
-	int left = getTreeHeight(start->left)+ 1;
-	int right = getTreeHeight(start->right)+ 1;
+	/*int left = getTreeHeight(start->left)+ 1;
+	int right = getTreeHeight(start->right)+ 1;*/
+	int left = 0, right = 0, R = 0, L = 0;
+	if (start->left != NULL)
+		left = start->left->height + 1;
+	if (start->right != NULL)
+		right = start->right->height + 1;
 
-	int i, L,R;
 
 	if (left - right > 1) {
-		R = getTreeHeight(start->left->right) + 1;
-		L = getTreeHeight(start->left->left) + 1;
-		if (R - L < 0 ) {
+		/*	R = getTreeHeight(start->left->right) + 1;
+			L = getTreeHeight(start->left->left) + 1;*/
+		if (start->left != NULL && start->left->left != NULL)
+			L = start->left->left->height + 1;
+		if (start->left != NULL && start->left->right != NULL)
+			R = start->left->right->height + 1;
+
+		if (R - L > 0) {
+			L = start->left->height--;
+			R = start->height--;
+			start = rotateRightLeftBST(start);
+			start->height = R > L ? R : L;
+		}
+		else {
+			start->height = R > right ? R : right;
+			start->left->height = start->height > L ? start->height : L;
 			start = rotateRightBST(start);
 		}
-		else {
-			start = rotateRightLeftBST(start);
-		}
 	}
-
-	if (left - right < -1) {
-		R = getTreeHeight(start->right->right) + 1;
-		L = getTreeHeight(start->right->left) + 1;
+	else if (left - right < -1) {
+		if (start->right != NULL && start->right->left != NULL)
+			L = start->right->left->height + 1;
+		if (start->right != NULL && start->right->right != NULL)
+			R = start->right->right->height + 1;
 
 		if (R - L < 0) {
+			R = start->right->height--;
+			L = start->height--;
 			start = rotateLeftRightBST(start);
+			start->height = R > L ? R : L;
 		}
 		else {
+			start->height = L > left ? L : left;
+			start->right->height = start->height > R ? start->height : R;
 			start = rotateLeftBST(start);
+			
 		}
+	}
+	else{
+		start->height = left > right ? left : right;
 	}
 
 	
@@ -175,6 +200,7 @@ NODE* insertNode(NODE* node, int v) {
 		node->left = NULL;
 		node->right = NULL;
 		node->value = v;
+		node->height = 0;
 	}
 	return node;
 }
