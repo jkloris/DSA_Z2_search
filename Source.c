@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
 
 
 typedef struct node {
@@ -7,32 +8,62 @@ typedef struct node {
 	struct node *right;
 	int value;
 	int height;
+	char fname[20];
+	char lname[20];
+	char code[10];
+
 }NODE;
+
+typedef struct data {
+	char fname[20];
+	char lname[20];
+	char code[10];
+}DATA;
 
 int _print_t(NODE* tree, int is_left, int offset, int depth, char s[20][255]); //TEMP
 void print_t(NODE* tree); //TEMP
 
-NODE* insertNode(NODE* node, int v);
+NODE* insertNode(NODE* node, int v, DATA*data);
 NODE* rotateRightBST(NODE* start);
 NODE* rotateLeftBST(NODE* start);
 NODE* rotateRightLeftBST(NODE* start);
 NODE* rotateLeftRightBST(NODE* start);
-int getTreeHeight(NODE* node);
+//int getTreeHeight(NODE* node);
 NODE* balanceBST(NODE* start);
 NODE* search(NODE* node, int v);
-NODE* testInsertNodes(NODE* start, int n);
+NODE* testInsertNodes(NODE* start, int n,DATA* data);
 void testSearch(NODE* start, int searchVal);
+DATA* getData(DATA* data);
 
 int main() {
 
+	DATA *data = malloc(100001 * sizeof(DATA));
+	data = getData(data);
+
 	NODE* start = NULL;
 	
-	start = testInsertNodes(start, 400000);
-	testSearch(start, 200999);
-	
+	start = testInsertNodes(start, 50000,data);
+	testSearch(start, 23050);
 	
 
 	return 0;
+}
+
+DATA*getData(DATA *data){
+	FILE* f = fopen("data.txt", "r");
+	char* buff[20];
+	int i = 0;
+	while (fscanf(f, "%s", buff) > 0) {
+		strcpy(data[i].fname, buff);
+		fscanf(f, "%s", buff);
+		strcpy(data[i].lname, buff);
+		fscanf(f, "%s", buff);
+		strcpy(data[i].code, buff);
+		i++;
+	}
+	
+	return data;
+
 }
 
 void testSearch(NODE* start, int searchVal) {
@@ -43,7 +74,7 @@ void testSearch(NODE* start, int searchVal) {
 	ms = dt * 1000 / CLOCKS_PER_SEC;
 
 	if (a != NULL) {
-		//TODO
+		printf("kluc: %d, mena: %s %s\n", searchVal, a->fname, a->lname);
 	}
 	else {
 		printf("Prvok nie je v zozname\n");
@@ -51,13 +82,13 @@ void testSearch(NODE* start, int searchVal) {
 	printf("Hladanie trvalo %d.%ds\n", ms / 1000, ms % 1000);
 }
 
-NODE * testInsertNodes(NODE* start, int n) {
+NODE * testInsertNodes(NODE* start, int n, DATA*data) {
 	int i, r, ms;
 	clock_t dt, now = clock();
 
 	for (i = 0; i < n; i++) {
-		r = rand() % 2*n + 1;
-		start = insertNode(start, r);
+		r = (rand() % (2*n)) + 1;
+		start = insertNode(start, r,data);
 		
 	}
 	dt = clock() - now;
@@ -204,16 +235,16 @@ NODE* rotateLeftBST(NODE* start) {
 
 
 
-NODE* insertNode(NODE* node, int v) {
+NODE* insertNode(NODE* node, int v, DATA *data) {
 
 	if (node != NULL) {
 		if (node->value < v){
-			node->right = insertNode(node->right, v);
+			node->right = insertNode(node->right, v,data);
 			node = balanceBST(node);
 		
 		}
 		else if (node->value > v) {
-			node->left = insertNode(node->left, v);
+			node->left = insertNode(node->left, v,data);
 			node = balanceBST(node);
 		} 
 		else {
@@ -227,6 +258,11 @@ NODE* insertNode(NODE* node, int v) {
 		node->right = NULL;
 		node->value = v;
 		node->height = 0;
+		//printf("%d\n", v);
+	
+		strcpy(node->code, data[v].code);
+		strcpy(node->lname, data[v].lname);
+		strcpy(node->fname, data[v].fname);
 	}
 	return node;
 }
