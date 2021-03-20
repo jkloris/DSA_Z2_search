@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <time.h>
 
 
 typedef struct node {
@@ -19,26 +20,51 @@ NODE* rotateLeftRightBST(NODE* start);
 int getTreeHeight(NODE* node);
 NODE* balanceBST(NODE* start);
 NODE* search(NODE* node, int v);
+NODE* testInsertNodes(NODE* start, int n);
+void testSearch(NODE* start, int searchVal);
 
 int main() {
 
 	NODE* start = NULL;
-	int r;
-	for (int i = 0; i < 200000; i++) {
-		r = rand() % 500000 + 1;
-		start = insertNode(start, r);
-		//print_t(start);
-		//printf("%d\n", r);
-	}
-
-	NODE *a = search(start, 456);
 	
-	
+	start = testInsertNodes(start, 400000);
+	testSearch(start, 200999);
 	
 	
 
-	//print_t(start);
 	return 0;
+}
+
+void testSearch(NODE* start, int searchVal) {
+	int ms;
+	clock_t dt, now = clock();
+	NODE* a = search(start, searchVal);
+	dt = clock() - now;
+	ms = dt * 1000 / CLOCKS_PER_SEC;
+
+	if (a != NULL) {
+		//TODO
+	}
+	else {
+		printf("Prvok nie je v zozname\n");
+	}
+	printf("Hladanie trvalo %d.%ds\n", ms / 1000, ms % 1000);
+}
+
+NODE * testInsertNodes(NODE* start, int n) {
+	int i, r, ms;
+	clock_t dt, now = clock();
+
+	for (i = 0; i < n; i++) {
+		r = rand() % 2*n + 1;
+		start = insertNode(start, r);
+		
+	}
+	dt = clock() - now;
+	ms = dt * 1000 / CLOCKS_PER_SEC;
+	printf("Naplnenie stromu %d prvkami trvalo %d.%ds\n",n, ms / 1000, ms % 1000);
+
+	return start;
 }
 
 NODE* search(NODE* node, int v) {
