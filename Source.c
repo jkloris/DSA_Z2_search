@@ -20,15 +20,13 @@ typedef struct data {
 	char code[10];
 }DATA;
 
-int _print_t(NODE* tree, int is_left, int offset, int depth, char s[20][255]); //TEMP
-void print_t(NODE* tree); //TEMP
 
 NODE* insertNode(NODE* node, int v, DATA*data);
 NODE* rotateRightBST(NODE* start);
 NODE* rotateLeftBST(NODE* start);
 NODE* rotateRightLeftBST(NODE* start);
 NODE* rotateLeftRightBST(NODE* start);
-//int getTreeHeight(NODE* node);
+
 NODE* balanceBST(NODE* start);
 NODE* search(NODE* node, int v);
 NODE* testInsertNodes(NODE* start, int n,DATA* data);
@@ -111,14 +109,14 @@ NODE* search(NODE* node, int v) {
 	return NULL;
 }
 
-int getTreeHeight(NODE* node) {
-	if (node != NULL) {
-		int left = getTreeHeight(node->left);
-		int right = getTreeHeight(node->right);
-		return ( 1 + ((left > right) ? left : right));
-	}
-	return -1;
-}
+//int getTreeHeight(NODE* node) {
+//	if (node != NULL) {
+//		int left = getTreeHeight(node->left);
+//		int right = getTreeHeight(node->right);
+//		return ( 1 + ((left > right) ? left : right));
+//	}
+//	return -1;
+//}
 
 NODE* balanceBST(NODE* start) {
 	/*int left = getTreeHeight(start->left)+ 1;
@@ -268,74 +266,4 @@ NODE* insertNode(NODE* node, int v, DATA *data) {
 }
 
 
-
-//TEMP 
-int _print_t(NODE* tree, int is_left, int offset, int depth, char s[20][255])
-{
-	char b[20];
-	int width = 5;
-
-	if (!tree) return 0;
-
-	sprintf(b, "(%03d)", tree->value);
-
-	int left = _print_t(tree->left, 1, offset, depth + 1, s);
-	int right = _print_t(tree->right, 0, offset + left + width, depth + 1, s);
-
-#ifdef COMPACT
-	for (int i = 0; i < width; i++)
-		s[depth][offset + left + i] = b[i];
-
-	if (depth && is_left) {
-
-		for (int i = 0; i < width + right; i++)
-			s[depth - 1][offset + left + width / 2 + i] = '-';
-
-		s[depth - 1][offset + left + width / 2] = '.';
-
-	}
-	else if (depth && !is_left) {
-
-		for (int i = 0; i < left + width; i++)
-			s[depth - 1][offset - width / 2 + i] = '-';
-
-		s[depth - 1][offset + left + width / 2] = '.';
-	}
-#else
-	for (int i = 0; i < width; i++)
-		s[2 * depth][offset + left + i] = b[i];
-
-	if (depth && is_left) {
-
-		for (int i = 0; i < width + right; i++)
-			s[2 * depth - 1][offset + left + width / 2 + i] = '-';
-
-		s[2 * depth - 1][offset + left + width / 2] = '+';
-		s[2 * depth - 1][offset + left + width + right + width / 2] = '+';
-
-	}
-	else if (depth && !is_left) {
-
-		for (int i = 0; i < left + width; i++)
-			s[2 * depth - 1][offset - width / 2 + i] = '-';
-
-		s[2 * depth - 1][offset + left + width / 2] = '+';
-		s[2 * depth - 1][offset - width / 2 - 1] = '+';
-	}
-#endif
-
-	return left + width + right;
-}
-
-void print_t(NODE* tree)
-{
-	char s[20][255];
-	for (int i = 0; i < 20; i++)
-		sprintf(s[i], "%80s", " ");
-
-	_print_t(tree, 0, 0, 0, s);
-
-	for (int i = 0; i < 20; i++)
-		printf("%s\n", s[i]);
-}
 
