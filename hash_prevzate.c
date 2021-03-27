@@ -1,4 +1,6 @@
 //#include <sys/time.h>
+//prevzate z https://github.com/exebook/hashdict.c 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -198,8 +200,8 @@ void testSearch(struct dictionary* dic, int count, DATA* data) {
 	for (i = 0; i < count; i++) {
 		//r = rand() % 100000;
 		//dic_add(dic, data[r].code, r);
-		if (dic_find(dic, data[i].code, 2))
-			 printf("%s found: %s %s\n", data[i].code, *dic->value, *dic->lastname);
+		if (dic_find(dic, data[i].code, 2));
+			// printf("%s found: %s %s\n", data[i].code, *dic->value, *dic->lastname);
 		//else// printf("error\n");
 	}
 
@@ -215,30 +217,14 @@ int main() {
 
 	struct dictionary* dic = dic_new(0);
 
-	testInstert(dic, 1000, data);
-	testSearch(dic, 100, data);
+	testInstert(dic, 100000, data);
+
+	testInstert(dic, 100, data);
+
+	testSearch(dic, 100000, data);
 
 
-	dic_add(dic, "ABC", 3);
-	*dic->value = 100;
-
-	dic_add(dic, "DE", 2);
-	*dic->value = 200;
-
-	dic_add(dic, "HJKL", 4);
-	*dic->value = 300;
-
-	if (dic_find(dic, "ABC", 3))
-		printf("ABC found: %i\n", *dic->value);
-	else printf("error\n");
-
-	if (dic_find(dic, "DE", 2))
-		printf("DE found: %i\n", *dic->value);
-	else printf("error\n");
-
-	if (dic_find(dic, "HJKL", 4))
-		printf("HJKL found: %i\n", *dic->value);
-	else printf("error\n");
+	
 
 	dic_delete(dic);
 	return 0;

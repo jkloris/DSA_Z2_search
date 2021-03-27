@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <time.h>
+#define nextIndexForm(i) (i*i)
+
 
 typedef struct data {
 	char fname[20];
@@ -8,8 +10,6 @@ typedef struct data {
 }DATA;
 
 typedef struct node {
-	struct node* next;
-	struct node* prev;
 	char fname[20];
 	char lname[20];
 	char key[10];
@@ -17,22 +17,108 @@ typedef struct node {
 }NODE;
 
 
-
-int getHash(NODE* node);
+int findIndex(NODE* hArray, int h_i, int size);
+int getHash(char *key);
 DATA* getData(DATA* data);
+NODE* hashInit(int initSize);
+int hashInsert(NODE* hashArray, char* key, char* fname, char* lname, int* size);
+NODE* rehash(NODE* hashArray, int* size);
 
 int main() {
 	DATA* data = malloc(100001 * sizeof(DATA));
 	data = getData(data);
 
-	NODE* a = malloc(sizeof(NODE));
-	strcpy(a->key, "ABC");
-	getHash(a);
+	int size = 10;
+	NODE* hashArray = hashInit(size);
+
+	for (int i = 0; i < 10; i++) {
+		hashInsert(hashArray, data[i].code, data[i].fname, data[i].lname, &size);
+	}
+
+	for (int i = 10; i < 100; i++) {
+		hashInsert(hashArray, data[i].code, data[i].fname, data[i].lname, &size);
+	}
+
+	hashInsert(hashArray, "DSD78dds", "LALA", "NANA", &size);
+	hashInsert(hashArray, "DSD789ds", "LALA2", "NANA", &size);
+	hashInsert(hashArray, "ESD78dds", "LALA3", "NANA", &size);
+
+
 	return 0;
 }
 
-int getHash(NODE *node) {
-	char* p = node->key;
+int hashInsert(NODE * hashArray, char* key, char* fname, char* lname, int *size) {
+	int h_i = getHash(key) % *size;
+	int buf = h_i;
+	
+	if (!strcmp(hashArray[h_i].key, "")) {
+		strcpy(hashArray[h_i].key, key);
+		strcpy(hashArray[h_i].fname, fname);
+		strcpy(hashArray[h_i].lname, lname);
+	
+		return 1;
+	}
+
+	while (findIndex(hashArray, h_i, *size) == -1) {
+		hashArray = rehash(hashArray, size);
+	}
+	
+	strcpy(hashArray[h_i].key, key);
+	strcpy(hashArray[h_i].fname, fname);
+	strcpy(hashArray[h_i].lname, lname);
+	return 1;
+}
+
+NODE* rehash(NODE* hashArray, int* size) {
+	int i, h_i;
+	*size *= 2;
+	NODE* buf = calloc(*size, sizeof(NODE));
+
+	for (i = 0; i < *size / 2; i++) {
+		if (!strcmp(hashArray[i].key, ""))
+			continue;
+
+		h_i = getHash(hashArray[i].key) % *size;
+
+		while (strcmp(buf[h_i].key, "")) {
+			h_i = findIndex(hashArray, h_i, *size);
+		}
+
+		buf[h_i] = hashArray[i];
+	}
+
+	free(hashArray);
+
+	return buf;
+}
+
+int findIndex(NODE* hArray, int h_i, int size) {
+	int buf = h_i;
+
+	do {
+		h_i = (nextIndexForm(h_i) % size);
+
+
+	} while (strcmp(hArray[h_i].key, "") && h_i != buf);
+
+	if (h_i == buf) {
+		return -1;
+	}
+	return h_i;
+}
+
+
+
+NODE* hashInit( int initSize) {
+	NODE* start = calloc(initSize, sizeof(NODE));
+
+	//memset(start, '\0', initSize * sizeof(NODE));
+	
+	return start;
+}
+
+int getHash(char *key) {
+	char* p = key;
 	int k = 3;
 	int sum = *p * k;
 	p++;
@@ -45,7 +131,7 @@ int getHash(NODE *node) {
 	}
 
 	printf("%d\n", sum);
-		
+	return sum;
 }
 
 DATA* getData(DATA* data) {
