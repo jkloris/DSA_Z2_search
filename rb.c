@@ -402,16 +402,19 @@ void  testInsertNodes(int n, DATAB* data) {
 void testSearch(struct rbNode* start, int searchVal) {
 	int ms;
 	clock_t dt, now = clock();
-	struct rbNode* a = search(start, searchVal);
+	// struct rbNode* a = search(start, searchVal);
+	for (int i = 0; i < 50000; i++) {
+		search(start, i);
+	}
 	dt = clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
 
-	if (a != NULL) {
+	/*if (a != NULL) {
 		printf("kluc: %d, mena: %s %s\n", searchVal, a->fname, a->lname);
 	}
 	else {
 		printf("Prvok nie je v zozname\n");
-	}
+	}*/
 	printf("Hladanie trvalo %d.%ds\n", ms / 1000, ms % 1000);
 }
 
