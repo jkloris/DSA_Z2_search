@@ -23,6 +23,9 @@ DATA* getData(DATA* data);
 NODE* hashInit(int initSize);
 NODE* hashInsert(NODE* hashArray, char* key, char* fname, char* lname, int* size);
 NODE* rehash(NODE* hashArray, int* size);
+NODE* testInsert(NODE* hashArray, int count, int* size, DATA* data);
+NODE hashSearch(NODE* hashArray, char* key, int size);
+void testSearch(NODE* hashArray, int count, int size, DATA* data);
 
 int main() {
 	DATA* data = malloc(100001 * sizeof(DATA));
@@ -31,21 +34,70 @@ int main() {
 	int size = 10;
 	NODE* hashArray = hashInit(size);
 
-	for (int i = 0; i < 10; i++) {
+	/*for (int i = 0; i < 10; i++) {
 
 		hashArray = hashInsert(hashArray, data[i].code, data[i].fname, data[i].lname, &size);
 	}
 
-	for (int i = 10; i < 100; i++) {
+	for (int i = 10; i < 90000; i++) {
 		hashArray = hashInsert(hashArray, data[i].code, data[i].fname, data[i].lname, &size);
-	}
+	}*/
 
-	hashInsert(hashArray, "DSD78dds", "LALA", "NANA", &size);
-	hashInsert(hashArray, "DSD789ds", "LALA2", "NANA", &size);
-	hashInsert(hashArray, "ESD78dds", "LALA3", "NANA", &size);
+	hashArray = testInsert(hashArray, 90000, &size, data);
 
+	testSearch(hashArray, 90000, size, data);
 
 	return 0;
+}
+
+void testSearch(NODE* hashArray, int count, int size, DATA* data) {
+	int ms, counter = 0;
+	clock_t dt, now = clock();
+	NODE a;
+
+	for (int i = 0; i < count; i++) {
+		a = hashSearch(hashArray, data[i].code, size);
+		if(!strcmp(a.key, ""))
+			counter++;
+	}
+	dt = clock() - now;
+	ms = dt * 1000 / CLOCKS_PER_SEC;
+
+	
+	printf("Hladanie trvalo %d.%ds\n", ms / 1000, ms % 1000);
+}
+
+NODE hashSearch(NODE* hashArray, char* key, int size) {
+	int h_i = getHash(key) % size;
+	int buf = h_i, f = 1;
+
+	while (strcmp(hashArray[h_i].key, key) && (buf != h_i || f)) {
+		h_i = (nextIndexForm(h_i) % size);
+		f = 0;
+	}
+	if (buf == h_i) {
+		NODE a;
+		strcpy(a.key, "");
+		return a;
+	}
+
+	return hashArray[h_i];
+}
+
+NODE* testInsert(NODE* hashArray, int count, int *size, DATA *data) {
+	int i, r, ms;
+	clock_t dt, now = clock();
+
+	for (i = 0; i < count; i++) {
+		r = rand() % 100000;
+		hashArray = hashInsert(hashArray, data[i].code, data[i].fname, data[i].lname, size);
+
+	}
+	dt = clock() - now;
+	ms = dt * 1000 / CLOCKS_PER_SEC;
+	printf("Naplnenie stromu %d prvkami trvalo %d.%ds\n", count, ms / 1000, ms % 1000);
+
+	return hashArray;
 }
 
 NODE* hashInsert(NODE * hashArray, char* key, char* fname, char* lname, int *size) {
