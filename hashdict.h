@@ -23,6 +23,7 @@ struct keynode {
 	char* key;
 	KEY_LENGTH_TYPE len;
 	HASHDICT_VALUE_TYPE value;
+	HASHDICT_VALUE_TYPE lastname;//moje
 };
 
 struct dictionary {
@@ -31,6 +32,7 @@ struct dictionary {
 	double growth_treshold;
 	double growth_factor;
 	HASHDICT_VALUE_TYPE* value;
+	HASHDICT_VALUE_TYPE *lastname;//moje
 };
 
 /* See README.md */

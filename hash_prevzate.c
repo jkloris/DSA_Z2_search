@@ -63,12 +63,14 @@ void dic_reinsert_when_resizing(struct dictionary* dic, struct keynode* k2) {
 	if (dic->table[n] == 0) {
 		dic->table[n] = k2;
 		dic->value = &dic->table[n]->value;
+		dic->lastname = &dic->table[n]->lastname; //moje
 		return;
 	}
 	struct keynode* k = dic->table[n];
 	k2->next = k;
 	dic->table[n] = k2;
 	dic->value = &k2->value;
+	dic->lastname = &k2->lastname; //moje
 }
 
 void dic_resize(struct dictionary* dic, int newsize) {
@@ -98,6 +100,7 @@ int dic_add(struct dictionary* dic, void* key, int keyn) {
 		}
 		dic->table[n] = keynode_new((char*)key, keyn);
 		dic->value = &dic->table[n]->value;
+		dic->lastname = &dic->table[n]->lastname; //moje
 		dic->count++;
 		return 0;
 	}
@@ -105,6 +108,7 @@ int dic_add(struct dictionary* dic, void* key, int keyn) {
 	while (k) {
 		if (k->len == keyn && memcmp(k->key, key, keyn) == 0) {
 			dic->value = &k->value;
+			dic->lastname = &k->lastname;//moje
 			return 1;
 		}
 		k = k->next;
@@ -114,6 +118,7 @@ int dic_add(struct dictionary* dic, void* key, int keyn) {
 	k2->next = dic->table[n];
 	dic->table[n] = k2;
 	dic->value = &k2->value;
+	dic->lastname = &k2->lastname;//moje
 	return 0;
 }
 
@@ -131,6 +136,7 @@ int dic_find(struct dictionary* dic, void* key, int keyn) {
 	while (k) {
 		if (k->len == keyn && !memcmp(k->key, key, keyn)) {
 			dic->value = &k->value;
+			dic->lastname = &k->lastname;//moje
 			return 1;
 		}
 		k = k->next;
@@ -177,12 +183,14 @@ void testInstert(struct dictionary* dic, int count, DATA* data) {
 	for (i = 0; i < count; i++) {
 		r = rand() % 100000;
 		dic_add(dic, data[r].code, 2);
+		*dic->value = data[r].fname;
+		*dic->lastname = data[r].lname;
 	}
 	dt = clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
 	printf("Naplnenie stromu %d prvkami trvalo %d.%ds\n", count, ms / 1000, ms % 1000);
 }
-
+//moje
 void testSearch(struct dictionary* dic, int count, DATA* data) {
 	int i, r, ms;
 	clock_t dt, now = clock();
@@ -190,9 +198,9 @@ void testSearch(struct dictionary* dic, int count, DATA* data) {
 	for (i = 0; i < count; i++) {
 		//r = rand() % 100000;
 		//dic_add(dic, data[r].code, r);
-		if (dic_find(dic, data[i].code, 2));
-			// printf("%s found: %i\n", data[i].code, *dic->value);
-		else;// printf("error\n");
+		if (dic_find(dic, data[i].code, 2))
+			 printf("%s found: %s %s\n", data[i].code, *dic->value, *dic->lastname);
+		//else// printf("error\n");
 	}
 
 	dt = clock() - now;
@@ -207,8 +215,8 @@ int main() {
 
 	struct dictionary* dic = dic_new(0);
 
-	testInstert(dic, 99000, data);
-	testSearch(dic, 99000, data);
+	testInstert(dic, 1000, data);
+	testSearch(dic, 100, data);
 
 
 	dic_add(dic, "ABC", 3);
