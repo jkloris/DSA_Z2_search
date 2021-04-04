@@ -10,12 +10,6 @@ typedef int (*enumFunc)(void* key, int count, int* value, void* user);
 #define HASHDICT_VALUE_TYPE int
 #define KEY_LENGTH_TYPE uint8_t
 
-//moje
-typedef struct data {
-	char fname[20];
-	char lname[20];
-	char code[10];
-}DATA;
 
 
 struct keynode {

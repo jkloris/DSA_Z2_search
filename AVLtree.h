@@ -1,10 +1,15 @@
+#ifndef AVLTREE
+#define AVLTREE
+
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <math.h>
+#include <stdlib.h>
 
 typedef struct node {
-	struct node *left;
-	struct node *right;
+	struct node* left;
+	struct node* right;
 	int value;
 	int height;
 	char fname[20];
@@ -27,7 +32,7 @@ typedef struct data {
 //NODE* rotateLeftRightBST(NODE* start);
 //
 //NODE* balanceBST(NODE* start);
-//NODE* search(NODE* node, int v);
+//NODE* searchAVL(NODE* node, int v);
 //NODE* testInsertNodes(NODE* start, int n,DATA* data);
 //void testSearch(NODE* start, int searchVal);
 
@@ -92,12 +97,12 @@ NODE* rotateLeftRightBST(NODE* start) {
 }
 
 
-NODE* search(NODE* node, int v) {
+NODE* searchAVL(NODE* node, int v) {
 	if (node != NULL) {
 		if (node->value < v)
-			return search(node->right, v);
+			return searchAVL(node->right, v);
 		else if (node->value > v)
-			return search(node->left, v);
+			return searchAVL(node->left, v);
 		else {
 			return node;
 		}
@@ -160,32 +165,32 @@ NODE* balanceBST(NODE* start) {
 			start->height = L > left ? L : left;
 			start->right->height = start->height > R ? start->height : R;
 			start = rotateLeftBST(start);
-			
+
 		}
 	}
-	else{
+	else {
 		start->height = left > right ? left : right;
 	}
 
-	
+
 	return start;
 }
 
 
 
 
-NODE* insertNode(NODE* node, int v, DATA *data) {
+NODE* insertNode(NODE* node, int v, DATA* data) {
 
 	if (node != NULL) {
-		if (node->value < v){
-			node->right = insertNode(node->right, v,data);
+		if (node->value < v) {
+			node->right = insertNode(node->right, v, data);
 			node = balanceBST(node);
-		
+
 		}
 		else if (node->value > v) {
-			node->left = insertNode(node->left, v,data);
+			node->left = insertNode(node->left, v, data);
 			node = balanceBST(node);
-		} 
+		}
 		else {
 			//printf("Given value already exists\n");
 			return node;
@@ -198,7 +203,7 @@ NODE* insertNode(NODE* node, int v, DATA *data) {
 		node->value = v;
 		node->height = 0;
 		//printf("%d\n", v);
-	
+
 		strcpy(node->code, data[v].code);
 		strcpy(node->lname, data[v].lname);
 		strcpy(node->fname, data[v].fname);
@@ -206,23 +211,18 @@ NODE* insertNode(NODE* node, int v, DATA *data) {
 	return node;
 }
 
-void testSearch(NODE* start, int searchVal) {
+void testSearchAVL(NODE* start, int n) {
 	int ms;
 	clock_t dt, now = clock();
 	//NODE* a = search(start, searchVal);
-	for (int i = 0; i < 50000; i++) {
-		search(start, i);
+	for (int i = 0; i < n; i++) {
+		searchAVL(start, i);
 	}
 	dt = clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
 
-	/*if (a != NULL) {
-		printf("kluc: %d, mena: %s %s\n", searchVal, a->fname, a->lname);
-	}
-	else {
-		printf("Prvok nie je v zozname\n");
-	}*/
-	printf("Hladanie trvalo %d.%ds\n", ms / 1000, ms % 1000);
+	
+	printf("Hladanie v AVL strome trvalo %d.%ds\n", ms / 1000, ms % 1000);
 
 
 }
@@ -238,9 +238,12 @@ NODE* testInsertNodes(NODE* start, int n, DATA* data) {
 	}
 	dt = clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
-	printf("Naplnenie stromu %d prvkami trvalo %d.%ds\n", n, ms / 1000, ms % 1000);
+	printf("Naplnenie AVL stromu %d prvkami trvalo %d.%ds\n", n, ms / 1000, ms % 1000);
 
 	return start;
 }
 
 
+
+
+#endif 
