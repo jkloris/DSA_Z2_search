@@ -33,15 +33,15 @@ struct rbNode {
 struct rbNode* root = NULL;
 
 // Create a red-black tree
-struct rbNode* createNode(int dats, DATA* data) {
+struct rbNode* createNode(int dats, char* fname, char* lname, char* code) {
 	struct rbNode* newnode;
 	newnode = (struct rbNode*)malloc(sizeof(struct rbNode));
 	newnode->dats = dats;
 	newnode->color = RED;
 	newnode->link[0] = newnode->link[1] = NULL;
-	strcpy(newnode->code, data[dats].code);
-	strcpy(newnode->lname, data[dats].lname);
-	strcpy(newnode->fname, data[dats].fname);
+	strcpy(newnode->code, code);
+	strcpy(newnode->lname, lname);
+	strcpy(newnode->fname, fname);
 	/*
 		char fname[20];
 		char lname[20];
@@ -50,12 +50,12 @@ struct rbNode* createNode(int dats, DATA* data) {
 }
 
 // Insert an node
-void insertion(int dats, DATA* data) {
+void insertion(int dats, char* fname, char* lname, char* code) {
 	struct rbNode* stack[98], * ptr, * newnode, * xPtr, * yPtr;
 	int dir[98], ht = 0, index;
 	ptr = root;
 	if (!root) {
-		root = createNode(dats, data);
+		root = createNode(dats, fname, lname, code);
 		return;
 	}
 
@@ -71,7 +71,7 @@ void insertion(int dats, DATA* data) {
 		ptr = ptr->link[index];
 		dir[ht++] = index;
 	}
-	stack[ht - 1]->link[index] = newnode = createNode(dats, data);
+	stack[ht - 1]->link[index] = newnode = createNode(dats, fname, lname,  code);
 	while ((ht >= 3) && (stack[ht - 1]->color == RED)) {
 		if (dir[ht - 2] == 0) {
 			yPtr = stack[ht - 2]->link[1];
@@ -377,8 +377,7 @@ void  testInsertRB(int n, DATA* data) {
 	clock_t dt, now = clock();
 
 	for (i = 0; i < n; i++) {
-		r = (rand() % (2 * n)) + 1;
-		insertion(r, data);
+		insertion(data[i].num, data[i].fname, data[i].lname, data[i].code);
 
 	}
 	dt = clock() - now;
@@ -388,19 +387,54 @@ void  testInsertRB(int n, DATA* data) {
 	//return start;
 }
 
-
-void testSearchRB(struct rbNode* start, int n) {
-	int ms;
+void  testInsertRBDupl(int n, DATA* data) {
+	int i, r, ms;
 	clock_t dt, now = clock();
-	// struct rbNode* a = search(start, searchVal);
+
+	for (i = 0; i < n/2; i++) {
+		insertion(data[i].num, data[i].fname, data[i].lname, data[i].code);
+		insertion(data[i].num, data[i].fname, data[i].lname, data[i].code);
+	}
+	dt = clock() - now;
+	ms = dt * 1000 / CLOCKS_PER_SEC;
+	printf("Naplnenie Red-black stromu %d(%d pokusov) prvkami trvalo %d.%ds\n", n/2,n, ms / 1000, ms % 1000);
+
+	//return start;
+}
+
+void testSearchRB(struct rbNode* start, int n, DATA* data) {
+	int ms, nop = 0;
+	clock_t dt, now = clock();
+	struct rbNode* a;
 	for (int i = 0; i < n; i++) {
-		searchRB(start, i);
+		a = searchRB(start, data[i].num);
+		if (a == NULL) {
+			nop++;
+		}
+	}
+	dt = clock() - now;
+	ms = dt * 1000 / CLOCKS_PER_SEC;
+
+
+	printf("Hladanie v Red-Black strome trvalo %d.%ds.. nenaslo %d\n", ms / 1000, ms % 1000, nop);
+}
+
+
+void testSearchRBfromZero(struct rbNode* start, int n) {
+	int ms, nop = 0;
+	clock_t dt, now = clock();
+	struct rbNode* a;
+	for (int i = 0; i < n; i++) {
+		a = searchRB(start, i);
+		if (a == NULL) {
+			nop++;
+		}
 	}
 	dt = clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
 
 	
-	printf("Hladanie v Red-Black strome trvalo %d.%ds\n", ms / 1000, ms % 1000);
+	printf("Hladanie v Red-Black strome trvalo %d.%ds.. nenaslo %d\n", ms / 1000, ms % 1000, nop);
 }
 
 // Driver code

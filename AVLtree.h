@@ -22,20 +22,22 @@ typedef struct data {
 	char fname[20];
 	char lname[20];
 	char code[10];
+	int num;
 }DATA;
 
-//
-//NODE* insertNode(NODE* node, int v, DATA*data);
-//NODE* rotateRightBST(NODE* start);
-//NODE* rotateLeftBST(NODE* start);
-//NODE* rotateRightLeftBST(NODE* start);
-//NODE* rotateLeftRightBST(NODE* start);
-//
-//NODE* balanceBST(NODE* start);
-//NODE* searchAVL(NODE* node, int v);
-//NODE* testInsertNodes(NODE* start, int n,DATA* data);
-//void testSearch(NODE* start, int searchVal);
 
+NODE* insertNode(NODE* node, int v, DATA*data);
+NODE* rotateRightBST(NODE* start);
+NODE* rotateLeftBST(NODE* start);
+NODE* rotateRightLeftBST(NODE* start);
+NODE* rotateLeftRightBST(NODE* start);
+
+NODE* balanceBST(NODE* start);
+NODE* searchAVL(NODE* node, int v);
+NODE* insertNode(NODE* node, int v, char* fname, char* lname, char* code);
+void testSearch(NODE* start, int searchVal);
+void testSearchAVLfromZero(NODE* start, int n);
+NODE* testInsertNodes(NODE* start, int n, DATA* data);
 
 
 
@@ -179,16 +181,16 @@ NODE* balanceBST(NODE* start) {
 
 
 
-NODE* insertNode(NODE* node, int v, DATA* data) {
+NODE* insertNode(NODE* node, int v, char* fname, char* lname, char* code) {
 
 	if (node != NULL) {
 		if (node->value < v) {
-			node->right = insertNode(node->right, v, data);
+			node->right = insertNode(node->right, v, fname, lname, code);
 			node = balanceBST(node);
 
 		}
 		else if (node->value > v) {
-			node->left = insertNode(node->left, v, data);
+			node->left = insertNode(node->left, v,  fname, lname, code);
 			node = balanceBST(node);
 		}
 		else {
@@ -204,27 +206,47 @@ NODE* insertNode(NODE* node, int v, DATA* data) {
 		node->height = 0;
 		//printf("%d\n", v);
 
-		strcpy(node->code, data[v].code);
-		strcpy(node->lname, data[v].lname);
-		strcpy(node->fname, data[v].fname);
+		strcpy(node->code, code);
+		strcpy(node->lname, lname);
+		strcpy(node->fname, fname);
 	}
 	return node;
 }
 
-void testSearchAVL(NODE* start, int n) {
-	int ms;
-	clock_t dt, now = clock();
-	//NODE* a = search(start, searchVal);
+void testSearchAVL(NODE* start, int n, DATA* data) {
+	int ms, nop = 0;
+	NODE *a;
+	clock_t dt = 0, now = clock();
+		
 	for (int i = 0; i < n; i++) {
-		searchAVL(start, i);
+		a = searchAVL(start, data[i].num);
+		if (a == NULL) {
+			nop++;
+		}
 	}
 	dt = clock() - now;
+	//dt = clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
 
-	
-	printf("Hladanie v AVL strome trvalo %d.%ds\n", ms / 1000, ms % 1000);
+	printf("Hladanie v AVL strome trvalo %d.%ds.. nenaslo %d\n", ms / 1000, ms % 1000, nop);
+}
 
+void testSearchAVLfromZero(NODE* start, int n) {
+	int ms, nop = 0;
+	NODE* a;
+	clock_t dt = 0, now = clock();
 
+	for (int i = 0; i < n; i++) {
+		a = searchAVL(start, i);
+		if (a == NULL) {
+			nop++;
+		}
+	}
+	dt = clock() - now;
+	//dt = clock() - now;
+	ms = dt * 1000 / CLOCKS_PER_SEC;
+
+	printf("Hladanie v AVL strome trvalo %d.%ds.. nenaslo %d\n", ms / 1000, ms % 1000, nop);
 }
 
 NODE* testInsertNodes(NODE* start, int n, DATA* data) {
@@ -232,13 +254,28 @@ NODE* testInsertNodes(NODE* start, int n, DATA* data) {
 	clock_t dt, now = clock();
 
 	for (i = 0; i < n; i++) {
-		r = (rand() % (2 * n)) + 1;
-		start = insertNode(start, r, data);
-
+		start = insertNode(start, data[i].num, data[i].fname, data[i].lname, data[i].code);
 	}
+
 	dt = clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
 	printf("Naplnenie AVL stromu %d prvkami trvalo %d.%ds\n", n, ms / 1000, ms % 1000);
+
+	return start;
+}
+
+NODE* testInsertNodesDupl(NODE* start, int n, DATA* data) {
+	int i, r, ms;
+	clock_t dt, now = clock();
+
+	for (i = 0; i < n/2; i++) {
+		start = insertNode(start, data[i].num, data[i].fname, data[i].lname, data[i].code);
+		start = insertNode(start, data[i].num, data[i].fname, data[i].lname, data[i].code);
+	}
+
+	dt = clock() - now;
+	ms = dt * 1000 / CLOCKS_PER_SEC;
+	printf("Naplnenie AVL stromu %d(%d pokusov) prvkami trvalo %d.%ds\n", n/2,n, ms / 1000, ms % 1000);
 
 	return start;
 }

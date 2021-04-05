@@ -22,29 +22,7 @@ NODE_H* rehash(NODE_H* hashArray, int* size);
 NODE_H* testInsertHashLinear(NODE_H* hashArray, int count, int* size, DATA* data);
 NODE_H hashSearch(NODE_H* hashArray, char* key, int size);
 void testSearchHashLinear(NODE_H* hashArray, int count, int size, DATA* data);
-
-//int main() {
-//	DATA* data = malloc(100001 * sizeof(DATA));
-//	data = getData(data);
-//
-//	int size = 10;
-//	NODE_H* hashArray = hashInit(size);
-//
-//	/*for (int i = 0; i < 10; i++) {
-//
-//		hashArray = hashInsert(hashArray, data[i].code, data[i].fname, data[i].lname, &size);
-//	}
-//
-//	for (int i = 10; i < 90000; i++) {
-//		hashArray = hashInsert(hashArray, data[i].code, data[i].fname, data[i].lname, &size);
-//	}*/
-//
-//	hashArray = testInsert(hashArray, 90000, &size, data);
-//
-//	testSearch(hashArray, 90000, size, data);
-//
-//	return 0;
-//}
+NODE_H* testInsertHashLinearDupl(NODE_H* hashArray, int count, int* size, int* stored, DATA* data, int datasize);
 
 void testSearchHashLinear(NODE_H* hashArray, int count, int size, DATA* data) {
 	int ms, counter = 0;
@@ -60,8 +38,10 @@ void testSearchHashLinear(NODE_H* hashArray, int count, int size, DATA* data) {
 	ms = dt * 1000 / CLOCKS_PER_SEC;
 
 
-	printf("Hladanie pomocou linearneho hashingu trvalo %d.%ds ...%d\n", ms / 1000, ms % 1000, counter);
+	printf("Hladanie pomocou linearneho hashingu trvalo %d.%ds ...nenaslo %d\n", ms / 1000, ms % 1000, counter);
 }
+
+
 
 NODE_H hashSearch(NODE_H* hashArray, char* key, int size) {
 	int h_i = getHash(key) % size;
@@ -74,7 +54,6 @@ NODE_H hashSearch(NODE_H* hashArray, char* key, int size) {
 	if ((buf == h_i && !f) || (!strcmp(hashArray[h_i].key, ""))) {
 		NODE_H a;
 		strcpy(a.key, "");
-		//printf("nenasiel sa\n");
 		return a;
 	}
 
@@ -83,19 +62,36 @@ NODE_H hashSearch(NODE_H* hashArray, char* key, int size) {
 
 NODE_H* testInsertHashLinear(NODE_H* hashArray, int count, int* size, int* stored, DATA* data) {
 	int i, r, ms;
-	clock_t dt, now = clock();
+	clock_t dt = 0, now = clock();
 
 	for (i = 0; i < count; i++) {
-		//r = rand() % 100000;
 		hashArray = hashInsert(hashArray, data[i].code, data[i].fname, data[i].lname, size, stored);
 
 	}
-	dt = clock() - now;
+	dt += clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
-	printf("Naplnenie linearnej hash tabulky %d prvkami trvalo %d.%ds\n", count, ms / 1000, ms % 1000);
+	printf("Naplnenie linearnej hash tabulky %d prvkami trvalo %d.%ds\n", *stored,  ms / 1000, ms % 1000);
 
 	return hashArray;
 }
+
+NODE_H* testInsertHashLinearDupl(NODE_H* hashArray, int count, int* size, int* stored, DATA* data, int datasize) {
+	int i, r, ms;
+	clock_t dt = 0, now = clock();
+
+	for (i = 0; i < count/2; i++) {
+		hashArray = hashInsert(hashArray, data[i].code, data[i].fname, data[i].lname, size, stored);
+		hashArray = hashInsert(hashArray, data[i].code, data[i].fname, data[i].lname, size, stored);
+
+	}
+
+	dt += clock() - now;
+	ms = dt * 1000 / CLOCKS_PER_SEC;
+	printf("Naplnenie linearnej hash tabulky %d(%d pokusov) prvkami trvalo %d.%ds\n", *stored, count,ms / 1000, ms % 1000);
+
+	return hashArray;
+}
+
 
 NODE_H* hashInsert(NODE_H* hashArray, char* key, char* fname, char* lname, int* size, int *stored) {
 	//printf("%f\n", ((float)(*stored) + 1) / (*size));
@@ -115,6 +111,10 @@ NODE_H* hashInsert(NODE_H* hashArray, char* key, char* fname, char* lname, int* 
 		return hashArray;
 	}
 
+	if (!strcmp(hashArray[h_i].key, key)) {
+		return hashArray;
+	}
+
 	while ((h_i = findIndex(hashArray, h_i, *size, key)) == -1) {
 		//hashArray = rehash(hashArray, size);
 		//h_i = getHash(key) % *size;
@@ -122,7 +122,6 @@ NODE_H* hashInsert(NODE_H* hashArray, char* key, char* fname, char* lname, int* 
 	}
 
 	if (!strcmp(hashArray[h_i].key, key)) {
-		printf("uz je");
 		return hashArray;
 	}
 

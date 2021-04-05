@@ -178,31 +178,50 @@ void testInstertHashTable(struct dictionary* dic, int count, DATA* data) {
 
 
 	for (i = 0; i < count; i++) {
-		r = rand() % 100000;
-		dic_add(dic, data[r].code, 2);
-		*dic->value = data[r].fname;
-		*dic->lastname = data[r].lname;
+		dic_add(dic, data[i].code, 8);
+		*dic->value = data[i].fname;
+		*dic->lastname = data[i].lname;
 	}
 	dt = clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
 	printf("Naplnenie hash tabulky %d prvkami trvalo %d.%ds\n", count, ms / 1000, ms % 1000);
 }
+
 //moje
-void testSearchHashTable(struct dictionary* dic, int count, DATA* data) {
+void testInstertHashTableDupl(struct dictionary* dic, int count, DATA* data) {
 	int i, r, ms;
 	clock_t dt, now = clock();
 
+
+	for (i = 0; i < count/2; i++) {
+		dic_add(dic, data[i].code, 8);
+		*dic->value = data[i].fname;
+		*dic->lastname = data[i].lname;
+
+		dic_add(dic, data[i].code, 8);
+	}
+	dt = clock() - now;
+	ms = dt * 1000 / CLOCKS_PER_SEC;
+	printf("Naplnenie hash tabulky %d(%d pokusov)prvkami trvalo %d.%ds\n", count/2, count, ms / 1000, ms % 1000);
+}
+
+//moje
+void testSearchHashTable(struct dictionary* dic, int count, DATA* data) {
+	int i, r, ms, found = 0;
+	clock_t dt, now = clock();
+
 	for (i = 0; i < count; i++) {
-		//r = rand() % 100000;
-		//dic_add(dic, data[r].code, r);
-		if (dic_find(dic, data[i].code, 2));
-		// printf("%s found: %s %s\n", data[i].code, *dic->value, *dic->lastname);
+		
+		if (dic_find(dic, data[i].code, 8)) {
+		 //printf("%s found: %s %s\n", data[i].code, *dic->value, *dic->lastname);
+			found++;
+		}
 	//else// printf("error\n");
 	}
 
 	dt = clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
-	printf("Hladanie v hash tabulke %d prvkov trvalo %d.%ds\n", count, ms / 1000, ms % 1000);
+	printf("Hladanie v hash tabulke %d prvkov trvalo %d.%ds.. nenaslo %d\n", count, ms / 1000, ms % 1000, count - found);
 }
 
 //int main() {
