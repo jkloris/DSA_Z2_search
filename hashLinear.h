@@ -60,33 +60,34 @@ void testSearchHashLinear(NODE_H* hashArray, int count, int size, DATA* data) {
 	ms = dt * 1000 / CLOCKS_PER_SEC;
 
 
-	printf("Hladanie pomocou linearneho hashingu trvalo %d.%ds\n", ms / 1000, ms % 1000);
+	printf("Hladanie pomocou linearneho hashingu trvalo %d.%ds ...%d\n", ms / 1000, ms % 1000, counter);
 }
 
 NODE_H hashSearch(NODE_H* hashArray, char* key, int size) {
 	int h_i = getHash(key) % size;
 	int buf = h_i, f = 1;
 
-	while (strcmp(hashArray[h_i].key, key) && (buf != h_i || f)) {
+	while (strcmp(hashArray[h_i].key, key) && (buf != h_i || f) && strcmp(hashArray[h_i].key,"")) {
 		h_i = (nextIndexForm(h_i) % size);
 		f = 0;
 	}
-	if (buf == h_i) {
+	if ((buf == h_i && !f) || (!strcmp(hashArray[h_i].key, ""))) {
 		NODE_H a;
 		strcpy(a.key, "");
+		//printf("nenasiel sa\n");
 		return a;
 	}
 
 	return hashArray[h_i];
 }
 
-NODE_H* testInsertHashLinear(NODE_H* hashArray, int count, int* size, DATA* data) {
+NODE_H* testInsertHashLinear(NODE_H* hashArray, int count, int* size, int* stored, DATA* data) {
 	int i, r, ms;
 	clock_t dt, now = clock();
 
 	for (i = 0; i < count; i++) {
-		r = rand() % 100000;
-		hashArray = hashInsert(hashArray, data[i].code, data[i].fname, data[i].lname, size);
+		//r = rand() % 100000;
+		hashArray = hashInsert(hashArray, data[i].code, data[i].fname, data[i].lname, size, stored);
 
 	}
 	dt = clock() - now;
@@ -96,7 +97,11 @@ NODE_H* testInsertHashLinear(NODE_H* hashArray, int count, int* size, DATA* data
 	return hashArray;
 }
 
-NODE_H* hashInsert(NODE_H* hashArray, char* key, char* fname, char* lname, int* size) {
+NODE_H* hashInsert(NODE_H* hashArray, char* key, char* fname, char* lname, int* size, int *stored) {
+	//printf("%f\n", ((float)(*stored) + 1) / (*size));
+	if ( ( ((float)(*stored)+1) / *size) > 0.5) {
+		hashArray = rehash(hashArray, size);
+	}
 
 	int h_i = getHash(key) % *size;
 	int buf = h_i;
@@ -106,20 +111,25 @@ NODE_H* hashInsert(NODE_H* hashArray, char* key, char* fname, char* lname, int* 
 		strcpy(hashArray[h_i].fname, fname);
 		strcpy(hashArray[h_i].lname, lname);
 		//printf("---%d\n", h_i);
+		(*stored)++;
 		return hashArray;
 	}
 
 	while ((h_i = findIndex(hashArray, h_i, *size, key)) == -1) {
-		hashArray = rehash(hashArray, size);
-		h_i = getHash(key) % *size;
+		//hashArray = rehash(hashArray, size);
+		//h_i = getHash(key) % *size;
+		printf("rehash.,\n");
 	}
 
-	if (!strcmp(hashArray[h_i].key, key))
+	if (!strcmp(hashArray[h_i].key, key)) {
+		printf("uz je");
 		return hashArray;
+	}
 
 	strcpy(hashArray[h_i].key, key);
 	strcpy(hashArray[h_i].fname, fname);
 	strcpy(hashArray[h_i].lname, lname);
+	(*stored)++;
 	//printf("---%d\n", h_i);
 
 	return hashArray;
