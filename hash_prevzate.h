@@ -10,13 +10,6 @@
 #include "hashdict.h"
 #define hash_func meiyan
 
-//moje
-//typedef struct data {
-//	char fname[20];
-//	char lname[20];
-//	char code[10];
-//}DATA;
-
 
 static inline uint32_t meiyan(const char* key, int count) {
 	typedef uint32_t* P;
@@ -184,7 +177,7 @@ void testInstertHashTable(struct dictionary* dic, int count, DATA* data) {
 	}
 	dt = clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
-	printf("Naplnenie hash tabulky %d prvkami trvalo %d.%ds\n", count, ms / 1000, ms % 1000);
+	printf("Naplnenie hash tabulky %d prvkami trvalo %dms\n", count, ms );
 }
 
 //moje
@@ -202,7 +195,7 @@ void testInstertHashTableDupl(struct dictionary* dic, int count, DATA* data) {
 	}
 	dt = clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
-	printf("Naplnenie hash tabulky %d(%d pokusov)prvkami trvalo %d.%ds\n", count/2, count, ms / 1000, ms % 1000);
+	printf("Naplnenie hash tabulky %d(%d pokusov)prvkami trvalo %dms\n", count/2, count, ms);
 }
 
 //moje
@@ -221,7 +214,7 @@ void testSearchHashTable(struct dictionary* dic, int count, DATA* data) {
 
 	dt = clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
-	printf("Hladanie v hash tabulke %d prvkov trvalo %d.%ds.. nenaslo %d\n", count, ms / 1000, ms % 1000, count - found);
+	printf("Hladanie v hash tabulke %d prvkov trvalo %dms.. nenaslo %d\n", count, ms, count - found);
 }
 
 //int main() {

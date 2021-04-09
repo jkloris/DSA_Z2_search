@@ -18,13 +18,6 @@ typedef struct node {
 
 }NODE;
 
-typedef struct data {
-	char fname[20];
-	char lname[20];
-	char code[10];
-	int num;
-}DATA;
-
 
 NODE* insertNode(NODE* node, int v, DATA*data);
 NODE* rotateRightBST(NODE* start);
@@ -42,7 +35,7 @@ NODE* testInsertNodes(NODE* start, int n, DATA* data);
 
 
 
-
+//rotacia uzlov doprava
 NODE* rotateRightBST(NODE* start) {
 	NODE* newTop = start->left;
 	/*start->left = newTop->right;
@@ -58,6 +51,7 @@ NODE* rotateRightBST(NODE* start) {
 
 }
 
+//rotacia uzlov dolava
 NODE* rotateLeftBST(NODE* start) {
 	NODE* newTop = start->right;
 	/*start->right = newTop->left;
@@ -73,6 +67,7 @@ NODE* rotateLeftBST(NODE* start) {
 
 }
 
+//specialna rotacia a potom doprava
 NODE* rotateRightLeftBST(NODE* start) {
 	NODE* oldTop = start->left;
 	start->left = oldTop->right;
@@ -85,6 +80,7 @@ NODE* rotateRightLeftBST(NODE* start) {
 
 }
 
+//specialna rotacia a potom dolava
 NODE* rotateLeftRightBST(NODE* start) {
 	NODE* oldTop = start->right;
 	NODE* newTop = oldTop->left;
@@ -98,7 +94,7 @@ NODE* rotateLeftRightBST(NODE* start) {
 
 }
 
-
+//hlavanie prvku podla kluca v
 NODE* searchAVL(NODE* node, int v) {
 	if (node != NULL) {
 		if (node->value < v)
@@ -112,33 +108,24 @@ NODE* searchAVL(NODE* node, int v) {
 	return NULL;
 }
 
-//int getTreeHeight(NODE* node) {
-//	if (node != NULL) {
-//		int left = getTreeHeight(node->left);
-//		int right = getTreeHeight(node->right);
-//		return ( 1 + ((left > right) ? left : right));
-//	}
-//	return -1;
-//}
-
+//vybalancovanie stromu
 NODE* balanceBST(NODE* start) {
-	/*int left = getTreeHeight(start->left)+ 1;
-	int right = getTreeHeight(start->right)+ 1;*/
 	int left = 0, right = 0, R = 0, L = 0;
+	//nacitaj vysky podstromov
 	if (start->left != NULL)
 		left = start->left->height + 1;
 	if (start->right != NULL)
 		right = start->right->height + 1;
 
-
+	//lava strana je prilis velka
 	if (left - right > 1) {
-		/*	R = getTreeHeight(start->left->right) + 1;
-			L = getTreeHeight(start->left->left) + 1;*/
+		//zisti hlbky podstromov laveho podstromu
 		if (start->left != NULL && start->left->left != NULL)
 			L = start->left->left->height + 1;
 		if (start->left != NULL && start->left->right != NULL)
 			R = start->left->right->height + 1;
 
+		//podla hlbok spravi spravnu rotaciu
 		if (R - L > 0) {
 			L = start->left->height--;
 			R = start->height--;
@@ -150,13 +137,15 @@ NODE* balanceBST(NODE* start) {
 			start->left->height = start->height > L ? start->height : L;
 			start = rotateRightBST(start);
 		}
-	}
+	} //prava strana je prilis velka
 	else if (left - right < -1) {
+		//zisti hlbky podstromov praveho podstromu
 		if (start->right != NULL && start->right->left != NULL)
 			L = start->right->left->height + 1;
 		if (start->right != NULL && start->right->right != NULL)
 			R = start->right->right->height + 1;
 
+		//podla hlbok spravi spravnu rotaciu
 		if (R - L < 0) {
 			R = start->right->height--;
 			L = start->height--;
@@ -178,12 +167,11 @@ NODE* balanceBST(NODE* start) {
 	return start;
 }
 
-
-
-
+//vkladanie prvku do AVL stromu
 NODE* insertNode(NODE* node, int v, char* fname, char* lname, char* code) {
 
 	if (node != NULL) {
+		//rekurzivne sa presiri do spravneho listu a spatne vybalancuje strom
 		if (node->value < v) {
 			node->right = insertNode(node->right, v, fname, lname, code);
 			node = balanceBST(node);
@@ -199,6 +187,7 @@ NODE* insertNode(NODE* node, int v, char* fname, char* lname, char* code) {
 		}
 	}
 	else {
+		//v prazdnom liste vytvori NODE s parametrami
 		node = malloc(sizeof(NODE));
 		node->left = NULL;
 		node->right = NULL;
@@ -228,7 +217,7 @@ void testSearchAVL(NODE* start, int n, DATA* data) {
 	//dt = clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
 
-	printf("Hladanie v AVL strome trvalo %d.%ds.. nenaslo %d\n", ms / 1000, ms % 1000, nop);
+	printf("Hladanie v AVL strome trvalo %dms.. nenaslo %d\n", ms , nop);
 }
 
 void testSearchAVLfromZero(NODE* start, int n) {
@@ -246,7 +235,7 @@ void testSearchAVLfromZero(NODE* start, int n) {
 	//dt = clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
 
-	printf("Hladanie v AVL strome trvalo %d.%ds.. nenaslo %d\n", ms / 1000, ms % 1000, nop);
+	printf("Hladanie v AVL strome trvalo %dms.. nenaslo %d\n", ms , nop);
 }
 
 NODE* testInsertNodes(NODE* start, int n, DATA* data) {
@@ -259,7 +248,7 @@ NODE* testInsertNodes(NODE* start, int n, DATA* data) {
 
 	dt = clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
-	printf("Naplnenie AVL stromu %d prvkami trvalo %d.%ds\n", n, ms / 1000, ms % 1000);
+	printf("Naplnenie AVL stromu %d prvkami trvalo %dms\n", n,  ms );
 
 	return start;
 }
@@ -275,7 +264,7 @@ NODE* testInsertNodesDupl(NODE* start, int n, DATA* data) {
 
 	dt = clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
-	printf("Naplnenie AVL stromu %d(%d pokusov) prvkami trvalo %d.%ds\n", n/2,n, ms / 1000, ms % 1000);
+	printf("Naplnenie AVL stromu %d(%d pokusov) prvkami trvalo %dms\n", n/2,n, ms );
 
 	return start;
 }

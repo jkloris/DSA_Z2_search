@@ -38,7 +38,7 @@ void testSearchHashLinear(NODE_H* hashArray, int count, int size, DATA* data) {
 	ms = dt * 1000 / CLOCKS_PER_SEC;
 
 
-	printf("Hladanie pomocou linearneho hashingu trvalo %d.%ds ...nenaslo %d\n", ms / 1000, ms % 1000, counter);
+	printf("Hladanie pomocou linearneho hashingu trvalo %dms ...nenaslo %d\n", ms , counter);
 }
 
 
@@ -70,7 +70,7 @@ NODE_H* testInsertHashLinear(NODE_H* hashArray, int count, int* size, int* store
 	}
 	dt += clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
-	printf("Naplnenie linearnej hash tabulky %d prvkami trvalo %d.%ds\n", *stored,  ms / 1000, ms % 1000);
+	printf("Naplnenie linearnej hash tabulky %d prvkami trvalo %dms\n", *stored,  ms);
 
 	return hashArray;
 }
@@ -87,14 +87,14 @@ NODE_H* testInsertHashLinearDupl(NODE_H* hashArray, int count, int* size, int* s
 
 	dt += clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
-	printf("Naplnenie linearnej hash tabulky %d(%d pokusov) prvkami trvalo %d.%ds\n", *stored, count,ms / 1000, ms % 1000);
+	printf("Naplnenie linearnej hash tabulky %d(%d pokusov) prvkami trvalo %dms\n", *stored, count,ms );
 
 	return hashArray;
 }
 
-
+//vkladanie prvku
 NODE_H* hashInsert(NODE_H* hashArray, char* key, char* fname, char* lname, int* size, int *stored) {
-	//printf("%f\n", ((float)(*stored) + 1) / (*size));
+	//kontrola ci zaplnenie nepresahuje 50% a pripadny rehash
 	if ( ( ((float)(*stored)+1) / *size) > 0.5) {
 		hashArray = rehash(hashArray, size);
 	}
@@ -102,6 +102,7 @@ NODE_H* hashInsert(NODE_H* hashArray, char* key, char* fname, char* lname, int* 
 	int h_i = getHash(key) % *size;
 	int buf = h_i;
 
+	//ak je miesto na najdenom indexe volne, pridam prvok
 	if (!strcmp(hashArray[h_i].key, "")) {
 		strcpy(hashArray[h_i].key, key);
 		strcpy(hashArray[h_i].fname, fname);
@@ -110,17 +111,18 @@ NODE_H* hashInsert(NODE_H* hashArray, char* key, char* fname, char* lname, int* 
 		(*stored)++;
 		return hashArray;
 	}
-
+	//ak je na tomto mieste prvok s rovnakym klucom, nic nepridam
 	if (!strcmp(hashArray[h_i].key, key)) {
 		return hashArray;
 	}
 
+	//ak je miesto zaplnene najde novy spravny index
 	while ((h_i = findIndex(hashArray, h_i, *size, key)) == -1) {
 		//hashArray = rehash(hashArray, size);
 		//h_i = getHash(key) % *size;
-		printf("rehash.,\n");
+		//printf("rehash.,\n");
 	}
-
+	//ak je na tomto mieste prvok s rovnakym klucom, nic nepridam
 	if (!strcmp(hashArray[h_i].key, key)) {
 		return hashArray;
 	}
@@ -134,11 +136,14 @@ NODE_H* hashInsert(NODE_H* hashArray, char* key, char* fname, char* lname, int* 
 	return hashArray;
 }
 
+
 NODE_H* rehash(NODE_H* hashArray, int* size) {
 	int i, h_i;
 	*size *= 2;
+	//nove pole
 	NODE_H* buf = calloc(*size, sizeof(NODE_H));
-
+	
+	//prekopiruje hodnoty zo stareho pola do noveho
 	for (i = 0; i < *size / 2; i++) {
 		if (!strcmp(hashArray[i].key, ""))
 			continue;
@@ -159,19 +164,21 @@ NODE_H* rehash(NODE_H* hashArray, int* size) {
 	return buf;
 }
 
+//hlada volne miesto v poli
 int findIndex(NODE_H* hArray, int h_i, int size, char* key) {
 	int buf = h_i;
 
 	do {
-		h_i = (nextIndexForm(h_i) % size);
+		h_i = (nextIndexForm(h_i) % size); //nova hodnota indexu
 
-		//printf("%s\n", hArray[h_i].key);
+		//kontroluje ci je miesto prazdne alebo ci nie je rovnaky kluc uz vlozeny
 	} while (strcmp(hArray[h_i].key, "") && h_i != buf && strcmp(hArray[h_i].key, key));
 
 	//if (!strcmp(hArray[h_i].key, hArray[buf].key)) { //ZLE TODO
 	//	return -2;
 	//}
 
+	
 	if (h_i == buf) {
 		return -1;
 	}
@@ -183,11 +190,10 @@ int findIndex(NODE_H* hArray, int h_i, int size, char* key) {
 NODE_H* hashInit(int initSize) {
 	NODE_H* start = calloc(initSize, sizeof(NODE_H));
 
-	//memset(start, '\0', initSize * sizeof(NODE_H));
-
 	return start;
 }
 
+//ziska hodnotu hashu ponocou hornerovej schemy 
 int getHash(char* key) {
 	char* p = key;
 	int k = 3;
@@ -201,11 +207,8 @@ int getHash(char* key) {
 
 	}
 
-	//printf("%d\n", sum);
 	return sum;
 }
-
-
 
 
 #endif

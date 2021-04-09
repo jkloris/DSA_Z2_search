@@ -13,19 +13,13 @@ enum nodeColor {
 	BLACK
 };
 
-//typedef struct data {
-//	char fname[20];
-//	char lname[20];
-//	char code[10];
-//}DATA;
-
-
 
 struct rbNode {
 	int dats, color;
 	struct rbNode* link[2];
 
-	char fname[20];
+	//moje
+	char fname[20]; 
 	char lname[20];
 	char code[10];
 };
@@ -382,7 +376,7 @@ void  testInsertRB(int n, DATA* data) {
 	}
 	dt = clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
-	printf("Naplnenie Red-black stromu %d prvkami trvalo %d.%ds\n", n, ms / 1000, ms % 1000);
+	printf("Naplnenie Red-black stromu %d prvkami trvalo %dms\n", n, ms );
 
 	//return start;
 }
@@ -397,7 +391,7 @@ void  testInsertRBDupl(int n, DATA* data) {
 	}
 	dt = clock() - now;
 	ms = dt * 1000 / CLOCKS_PER_SEC;
-	printf("Naplnenie Red-black stromu %d(%d pokusov) prvkami trvalo %d.%ds\n", n/2,n, ms / 1000, ms % 1000);
+	printf("Naplnenie Red-black stromu %d(%d pokusov) prvkami trvalo %dms\n", n/2,n, ms );
 
 	//return start;
 }
@@ -416,7 +410,7 @@ void testSearchRB(struct rbNode* start, int n, DATA* data) {
 	ms = dt * 1000 / CLOCKS_PER_SEC;
 
 
-	printf("Hladanie v Red-Black strome trvalo %d.%ds.. nenaslo %d\n", ms / 1000, ms % 1000, nop);
+	printf("Hladanie v Red-Black strome trvalo %dms.. nenaslo %d\n", ms , nop);
 }
 
 
@@ -434,7 +428,7 @@ void testSearchRBfromZero(struct rbNode* start, int n) {
 	ms = dt * 1000 / CLOCKS_PER_SEC;
 
 	
-	printf("Hladanie v Red-Black strome trvalo %d.%ds.. nenaslo %d\n", ms / 1000, ms % 1000, nop);
+	printf("Hladanie v Red-Black strome trvalo %dms.. nenaslo %d\n", ms , nop);
 }
 
 // Driver code
